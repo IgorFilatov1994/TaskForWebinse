@@ -26,10 +26,6 @@
   </head>
   <body>
   
-  <div class="container" id="input"> 
-
-	<h4>Таблица отображается ниже:</h4>
-</div>
 <div class="container" id="output">        
   <table class="table table-bordered" id="tab_logic">
     <thead>
@@ -49,11 +45,6 @@
   </table>
 </div>
 
-<div class="container" id="input"> 
-
-	<h4>Для добавления введите данные ниже и нажмите кнопку</h4>
-</div>
-
 <div class="container" id="input">        
   <table class="table table-bordered" id="tabInput">
     <thead>
@@ -70,7 +61,7 @@
 		<td contenteditable='false'>ID</td>
 		<td class='fname' contenteditable='true'>Firstname</td>
 		<td class='lname' contenteditable='true'>Lastname</td>
-		<td class='email' contenteditable='true'>Email</td>
+		<td class='email' contenteditable='true'>samleemail@google.com</td>
 		<td><input class='addButton' type='button' value='ADD'></td>
 	  <tr>
     </tbody>
@@ -87,6 +78,7 @@
   $(document).ready(function () 
   {
 	var i=0;
+	var isOk = false;
     //-----------------------------------------------------------------------
     // 2) Send a http request with AJAX http://api.jquery.com/jQuery.ajax/
     //-----------------------------------------------------------------------
@@ -114,7 +106,7 @@
         // http://api.jquery.com/category/selectors/
       } 
     });
-	$('#input').on('click', '.addButton', function(){
+	$('.container').on('click', '.addButton', function(){
 		var fname;
 		var sname;
 		var email;
@@ -137,7 +129,7 @@
 			sname : sname,
 			email : email
 		};
-		
+		if (isOk == true){
 		$.post("add.php", data, function(json) {
 			console.log(json.time);
 		}, "json")
@@ -146,6 +138,7 @@
 			$('#tab_logic').append('<tr id="addr'+(i+1)+'"></tr>');
 			i++; 
 		});
+		}
 		
     });
 	$('.container').on('click', '.editButton', function(){
@@ -177,9 +170,11 @@
 			sname : sname,
 			email : email
 		};
+		if (isOk == true){
 		$.post("update.php", data, function(json) {
 			console.log(json.time);
 		}, "json");
+		}
 		
     });
 	$('.container').on('click', '.deleteButton', function(){
@@ -203,22 +198,27 @@
 	
 	$('.container').on('blur', '.email',function() {
 			var email;
+			var eitm;
 			$(this).closest("tr").find("td").each(function(idx, itm){
 			switch (idx){
 				case 3:
 					email = itm.innerHTML;
+					eitm = itm;
 					break;
 			}
 			});
 		if(email != '') {
             var pattern = /^([a-z0-9_\.-])+@[a-z0-9-]+\.([a-z]{2,4}\.)?[a-z]{2,4}$/i;
             if(pattern.test(email)){
-                alert('Верно');
+				isOk = true;
+				$(this).css({'background' : 'rgb(127,255,0)'});
             } else {
-                alert('Не верно');
+			isOk = false;
+                $(this).css({'background' : '#FF3C00'});
             }
         } else {
-            alert('Поле email не должно быть пустым');
+		isOk = false;
+            $(this).css({'background' : '#FF3C00'});
         }
     });
 	
@@ -232,8 +232,11 @@
 			}
 			});
 		if(fname != '') {
+		$(this).css({'background' : 'white'});
+		isOk = true;
         } else {
-            alert('Поле fname не должно быть пустым');
+		isOk = false;
+            $(this).css({'background' : '#FF3C00'});
         }
     });
 	
@@ -247,8 +250,11 @@
 			}
 			});
 		if(lname != '') {
+		$(this).css({'background' : 'white'});
+		isOk = true;
         } else {
-            alert('Поле lname не должно быть пустым');
+		isOk = false;
+            $(this).css({'background' : '#FF3C00'});
         }
     });
 	
