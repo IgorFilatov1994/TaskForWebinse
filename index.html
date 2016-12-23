@@ -78,7 +78,9 @@
   $(document).ready(function () 
   {
 	var i=0;
-	var isOk = false;
+	var isOkFname = false;
+	var isOkLname = false;
+	var isOkEmail = false;
     //-----------------------------------------------------------------------
     // 2) Send a http request with AJAX http://api.jquery.com/jQuery.ajax/
     //-----------------------------------------------------------------------
@@ -129,7 +131,7 @@
 			sname : sname,
 			email : email
 		};
-		if (isOk == true){
+		if (isOkFname == true && isOkLname == true && isOkEmail == true){
 		$.post("add.php", data, function(json) {
 			console.log(json.time);
 		}, "json")
@@ -170,7 +172,7 @@
 			sname : sname,
 			email : email
 		};
-		if (isOk == true){
+		if (isOkFname == true && isOkLname == true && isOkEmail == true){
 		$.post("update.php", data, function(json) {
 			console.log(json.time);
 		}, "json");
@@ -210,14 +212,14 @@
 		if(email != '') {
             var pattern = /^([a-z0-9_\.-])+@[a-z0-9-]+\.([a-z]{2,4}\.)?[a-z]{2,4}$/i;
             if(pattern.test(email)){
-				isOk = true;
+				isOkEmail = true;
 				$(this).css({'background' : 'rgb(127,255,0)'});
             } else {
-			isOk = false;
+			isOkEmail = false;
                 $(this).css({'background' : '#FF3C00'});
             }
         } else {
-		isOk = false;
+		isOkEmail = false;
             $(this).css({'background' : '#FF3C00'});
         }
     });
@@ -233,9 +235,9 @@
 			});
 		if(fname != '') {
 		$(this).css({'background' : 'white'});
-		isOk = true;
+		isOkFname = true;
         } else {
-		isOk = false;
+		isOkFname = false;
             $(this).css({'background' : '#FF3C00'});
         }
     });
@@ -251,9 +253,9 @@
 			});
 		if(lname != '') {
 		$(this).css({'background' : 'white'});
-		isOk = true;
+		isOkLname = true;
         } else {
-		isOk = false;
+		isOkLname = false;
             $(this).css({'background' : '#FF3C00'});
         }
     });
