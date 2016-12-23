@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Human`s</title>
+
+	<!-- JQuerry -->
+	<script language="javascript" type="text/javascript" src="jquery.js"></script>
+    
+	<!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+	
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  
+  <div class="container" id="input"> 
+
+	<h4>Таблица отображается ниже:</h4>
+</div>
+<div class="container" id="output">        
+  <table class="table table-bordered" id="tab_logic">
+    <thead>
+      <tr>
+		<th>ID</th>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Email</th>
+		<th>EDIT</th>
+		<th>DELETE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id='addr0'>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="container" id="input"> 
+
+	<h4>Для добавления введите данные ниже и нажмите кнопку</h4>
+</div>
+
+<div class="container" id="input">        
+  <table class="table table-bordered" id="tabInput">
+    <thead>
+      <tr>
+		<th>ID</th>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Email</th>
+		<th>ADD</th>
+      </tr>
+    </thead>
+    <tbody>
+	  <tr id='addNew'>
+		<td contenteditable='false'>ID</td>
+		<td class='fname' contenteditable='true'>Firstname</td>
+		<td class='lname' contenteditable='true'>Lastname</td>
+		<td class='email' contenteditable='true'>Email</td>
+		<td><input class='addButton' type='button' value='ADD'></td>
+	  <tr>
+    </tbody>
+  </table>
+</div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+	
+	<script id="source" language="javascript" type="text/javascript">
+
+  $(document).ready(function () 
+  {
+	var i=0;
+    //-----------------------------------------------------------------------
+    // 2) Send a http request with AJAX http://api.jquery.com/jQuery.ajax/
+    //-----------------------------------------------------------------------
+    $.ajax({                                      
+      url: 'sql.php',                  //the script to call to get data          
+      data: "",                        //you can insert url argumnets here to pass to api.php
+                                       //for example "id=5&parent=6"
+      dataType: 'json',                //data format      
+      success: function(data)          //on recieve of reply
+      {
+		$.each(data, function(index, element) {
+			var id_test_table = element.id_test_table;              //get id
+			var first_name = element.First_name;           //get name
+			var second_name = element.Second_name;;           //get name
+			var email = element.E_mail;           //get name
+			//--------------------------------------------------------------------
+			// 3) Update html content
+			//--------------------------------------------------------------------
+			$('#addr'+i).html("<td class='id' contenteditable='false'>"+ id_test_table +"</td><td class='fname' contenteditable='true'>" + first_name +" </td><td class='lname' contenteditable='true'>" + second_name +"</td><td class='email' contenteditable='true'>" + email + "</td>" + "<td><input class='editButton' type='button' value='EDIT'></td>" + "<td><input class='deleteButton' type='button' value='DELETE'/></td>");
+			$('#tab_logic').append('<tr id="addr'+(i+1)+'"></tr>');
+			i++; 
+        });
+        
+		//recommend reading up on jquery selectors they are awesome 
+        // http://api.jquery.com/category/selectors/
+      } 
+    });
+	$('#input').on('click', '.addButton', function(){
+		var fname;
+		var sname;
+		var email;
+			$(this).closest("tr").find("td").each(function(idx, itm){
+			switch (idx){
+				case 1:
+					fname = itm.innerHTML;
+					break;
+				case 2:
+					sname = itm.innerHTML;
+					break;
+				case 3:
+					email = itm.innerHTML;
+					break;
+			}
+		});
+		
+		var data = {
+			fname : fname,
+			sname : sname,
+			email : email
+		};
+		
+		$.post("add.php", data, function(json) {
+			console.log(json.time);
+		}, "json")
+		.success(function(data) {
+			$('#addr'+i).html("<td class='id' contenteditable='false'>"+ data +"</td><td class='fname' contenteditable='true'>" + fname +" </td><td class='lname' contenteditable='true'>" + sname +"</td><td class='email' contenteditable='true'>" + email + "</td>" + "<td><input class='editButton' type='button' value='EDIT'></td>" + "<td><input class='deleteButton' type='button' value='DELETE'/></td>");
+			$('#tab_logic').append('<tr id="addr'+(i+1)+'"></tr>');
+			i++; 
+		});
+		
+    });
+	$('.container').on('click', '.editButton', function(){
+		
+		var id;
+		var fname;
+		var sname;
+		var email;
+		$(this).closest("tr").find("td").each(function(idx, itm){
+			switch (idx){
+				case 0:
+					id = itm.innerHTML;
+					break;
+				case 1:
+					fname = itm.innerHTML;
+					break;
+				case 2:
+					sname = itm.innerHTML;
+					break;
+				case 3:
+					email = itm.innerHTML;
+					break;
+			}
+		});
+		
+		var data = {
+			id : id,
+			fname : fname,
+			sname : sname,
+			email : email
+		};
+		$.post("update.php", data, function(json) {
+			console.log(json.time);
+		}, "json");
+		
+    });
+	$('.container').on('click', '.deleteButton', function(){
+			var id;
+			var index;
+			$(this).closest("tr").find("td").each(function(idx, itm){
+			switch (idx){
+				case 0:
+					id = itm.innerHTML;
+					break;
+			}
+		});
+			$(this).closest("tr").remove();
+		var data = {
+			id : id
+		};
+		$.post("delete.php", data, function(json) {
+			console.log(json.time);
+		}, "json");
+	});
+	
+	$('.container').on('blur', '.email',function() {
+			var email;
+			$(this).closest("tr").find("td").each(function(idx, itm){
+			switch (idx){
+				case 3:
+					email = itm.innerHTML;
+					break;
+			}
+			});
+		if(email != '') {
+            var pattern = /^([a-z0-9_\.-])+@[a-z0-9-]+\.([a-z]{2,4}\.)?[a-z]{2,4}$/i;
+            if(pattern.test(email)){
+                alert('Верно');
+            } else {
+                alert('Не верно');
+            }
+        } else {
+            alert('Поле email не должно быть пустым');
+        }
+    });
+	
+	$('.container').on('blur', '.fname',function() {
+			var fname;
+			$(this).closest("tr").find("td").each(function(idx, itm){
+			switch (idx){
+				case 1:
+					fname = itm.innerHTML;
+					break;
+			}
+			});
+		if(fname != '') {
+        } else {
+            alert('Поле fname не должно быть пустым');
+        }
+    });
+	
+	$('.container').on('blur', '.lname',function() {
+			var lname;
+			$(this).closest("tr").find("td").each(function(idx, itm){
+			switch (idx){
+				case 2:
+					lname = itm.innerHTML;
+					break;
+			}
+			});
+		if(lname != '') {
+        } else {
+            alert('Поле lname не должно быть пустым');
+        }
+    });
+	
+	
+  }); 
+
+  </script>
+  
+  </body>
+</html>
